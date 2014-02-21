@@ -27,15 +27,15 @@ get '/memos' do
 end
 
 post '/memos' do
-  inserted_id = memos.insert(title: params[:title], description: params[:description])
+  inserted_id = memos.insert(:title => params[:title], :description => params[:description])
   inserted_id.to_json
 end
 
 get '/memos/:id' do
   id = BSON::ObjectId(params[:id])
 
-  docs = memos.find(_id: id).to_a
-  halt 404, { message: "not found" }.to_json if docs.none?
+  docs = memos.find(:_id => id).to_a
+  halt 404, { :message => "not found" }.to_json if docs.none?
 
   docs[0].to_json
 end
@@ -43,15 +43,15 @@ end
 put '/memos/:id' do
   id = BSON::ObjectId(params[:id])
 
-  docs = memos.find(_id: id).to_a
-  halt 404, { message: "not found" }.to_json if docs.none?
+  docs = memos.find(:_id => id).to_a
+  halt 404, { :message => "not found" }.to_json if docs.none?
 
   filter = ["title", "description"]
   update_params = params.select { |key, _| filter.include? key }
-  memos.update({ _id: id }, docs[0].merge(update_params))
+  memos.update({ :_id => id }, docs[0].merge(update_params))
 
-  updated_docs = memos.find(_id: id).to_a
-  halt 500, { message: "failed to update memo" }.to_json if updated_docs.none?
+  updated_docs = memos.find(:_id => id).to_a
+  halt 500, { :message => "failed to update memo" }.to_json if updated_docs.none?
 
   updated_docs[0].to_json
 end
@@ -59,8 +59,8 @@ end
 delete '/memos/:id' do
   id = BSON::ObjectId(params[:id])
 
-  memos.remove(_id: id)
-  halt 500, { message: "failed to remove memo" }.to_json unless memos.find(_id: id).to_a.none?
+  memos.remove(:_id => id)
+  halt 500, { :message => "failed to remove memo" }.to_json unless memos.find(:_id => id).to_a.none?
 
-  { message: "succeeded to remove memo" }.to_json
+  { :message => "succeeded to remove memo" }.to_json
 end
